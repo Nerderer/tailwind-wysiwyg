@@ -1,2 +1,33 @@
 # tailwind-wysiwyg
-A WYSIWYG editor for Tailwind CSS
+
+A WYSIWYG editor for <a href="https://tailwindcss.com/docs/what-is-tailwind/">Tailwind CSS</a>
+
+## Demo
+<a href="https://www.nerderer.com/Experiments/tailwind-wysiwyg/">Try it out here!</a>
+
+## Installation
+
+```js
+yarn install
+```
+
+Or if you prefer npm:
+
+```js
+npm install
+```
+
+## Run the app
+
+For the dev version with hot reload run:
+
+```js
+yarn dev
+```
+_Must be run on a server, local "file:" will not work_
+
+To build for production run:
+
+```js
+yarn prod
+```
