@@ -1,11 +1,15 @@
 # tailwind-wysiwyg
 
-A WYSIWYG editor for <a href="https://tailwindcss.com/docs/what-is-tailwind/">Tailwind CSS</a>
+A WYSIWYG editor for <a href="https://tailwindcss.com/docs/what-is-tailwind/" target="_blank" >Tailwind CSS</a>
 
 ## Demo
-<a href="https://www.nerderer.com/Experiments/tailwind-wysiwyg/">Try it out here!</a>
+<a href="https://www.nerderer.com/Experiments/tailwind-wysiwyg/" target="_blank">Try it out here!</a>
 
 ## Installation
+
+```js
+Clone this repo!
+```
 
 ```js
 yarn install
