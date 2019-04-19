@@ -25,7 +25,11 @@
 
 
 				<div v-if="activeTab === 'template'" class="p-2 px-4 h-56">
-					<prism-editor v-model="template" language="html"></prism-editor>
+					<prism-editor
+						v-model="template"
+						language="html"
+						class="prism-editor"
+					></prism-editor>
 
 					<button class="bg-blue-500 hover:bg-blue-600 text-white inline-block p-2 float-right my-2" @click="sync()">
 						Sync [placeholders]
@@ -33,7 +37,12 @@
 				</div>
 
 				<div v-else class="p-2 px-4 h-56">
-					<prism-editor v-model="parsedTemplate" readonly language="html"></prism-editor>
+					<prism-editor
+						v-model="parsedTemplate"
+						readonly
+						language="html"
+						class="prism-editor"
+					></prism-editor>
 				</div>
 			</div>
 		</main>
@@ -113,7 +122,8 @@
                 let parsedTemplate = this.template;
 
                 for (const placeholder of this.storeState.placeholders) {
-                    parsedTemplate = parsedTemplate.replace('[' + placeholder.name + ']', placeholder.selected.join(' '));
+                    const placeholderString = '[' + placeholder.name + ']';
+                    parsedTemplate = parsedTemplate.split(placeholderString).join(placeholder.selected.join(' '));
                 }
                 return parsedTemplate;
             }
@@ -162,3 +172,11 @@
         }
     };
 </script>
+
+<style>
+	.prism-editor pre {
+		margin: 0;
+		height: 150px;
+		overflow: scroll;
+	}
+</style>
