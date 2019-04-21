@@ -25,11 +25,10 @@
 
 
 				<div v-if="activeTab === 'template'" class="p-2 px-4 h-56">
-					<prism-editor
+					<code-mirror-editor
 						v-model="template"
-						language="html"
-						class="prism-editor"
-					></prism-editor>
+						:options="editorOptions"
+					></code-mirror-editor>
 
 					<button class="bg-blue-500 hover:bg-blue-600 text-white inline-block p-2 float-right my-2" @click="sync()">
 						Sync [placeholders]
@@ -37,12 +36,11 @@
 				</div>
 
 				<div v-else class="p-2 px-4 h-56">
-					<prism-editor
-						v-model="parsedTemplate"
+					<code-mirror-editor
+						:value="parsedTemplate"
+						:options="editorOptions"
 						readonly
-						language="html"
-						class="prism-editor"
-					></prism-editor>
+					></code-mirror-editor>
 				</div>
 			</div>
 		</main>
@@ -91,18 +89,25 @@
 </template>
 
 <script>
-    import 'prismjs';
-    import 'prismjs/themes/prism.css';
-    import PrismEditor from 'vue-prism-editor';
+    import CodeMirror from 'codemirror';
+    import CodeMirrorEditor from 'vue-cm';
+    import emmet from 'codemirror-emmet';
     import categories from '../../setup/categories';
     import SelectionPanel from './SelectionPanel';
     import appStore from '../../stores/appStore';
+
+    // Code Mirror + Emmet
+    import 'codemirror/mode/htmlmixed/htmlmixed.js';
+    import 'codemirror/lib/codemirror.css';
+    import 'codemirror/theme/base16-dark.css';
+
+    emmet(CodeMirror);
 
     export default {
         name: 'App',
         components: {
             SelectionPanel,
-            PrismEditor
+            CodeMirrorEditor
         },
         data() {
             return {
@@ -114,7 +119,30 @@
                 selectedMainCategory: categories[0],
                 selectedSubCategory: categories[0].subCategories[0],
                 storeState: appStore.state,
-                activeTab: 'template'
+                activeTab: 'template',
+                editorOptions: {
+                    mode: 'htmlmixed',
+                    lineNumbers: true,
+                    theme: 'base16-dark',
+                    extraKeys: {
+                        Tab(cm) {
+                            // Indent, or place 2 spaces
+                            if (cm.somethingSelected()) {
+                                cm.indentSelection('add');
+                            } else if (cm.getOption('mode').indexOf('html') > -1) {
+                                try {
+                                    cm.execCommand('emmetExpandAbbreviation');
+                                } catch (err) {
+                                    console.error(err);
+                                }
+                            } else {
+                                const spaces = Array(cm.getOption('indentUnit') + 1).join(' ');
+                                cm.replaceSelection(spaces, 'end', '+input');
+                            }
+                        },
+                        Enter: 'emmetInsertLineBreak'
+                    }
+                },
             };
         },
         computed: {
@@ -174,9 +202,8 @@
 </script>
 
 <style>
-	.prism-editor pre {
-		margin: 0;
-		height: 150px;
-		overflow: scroll;
+	.CodeMirror {
+		border: 1px solid #eee;
+		height: 160px;
 	}
 </style>
