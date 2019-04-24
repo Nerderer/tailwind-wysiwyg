@@ -23,7 +23,6 @@
 					</li>
 				</ul>
 
-
 				<div v-if="activeTab === 'template'" class="p-2 px-4 h-56">
 					<code-mirror-editor
 						v-model="template"
@@ -31,7 +30,7 @@
 					></code-mirror-editor>
 
 					<button class="bg-blue-500 hover:bg-blue-600 text-white inline-block p-2 float-right my-2" @click="sync()">
-						Sync [placeholders]
+						Sync classes
 					</button>
 				</div>
 
@@ -39,7 +38,7 @@
 					<code-mirror-editor
 						:value="parsedTemplate"
 						:options="editorOptions"
-						readonly
+						class="output-editor"
 					></code-mirror-editor>
 				</div>
 			</div>
@@ -99,9 +98,10 @@
     // Code Mirror + Emmet
     import 'codemirror/mode/htmlmixed/htmlmixed.js';
     import 'codemirror/lib/codemirror.css';
-    import 'codemirror/theme/base16-dark.css';
-
+    import 'codemirror/theme/gruvbox-dark.css';
     emmet(CodeMirror);
+
+    const classRegEx = /class\=\"([A-Za-z0-9 _-]*)\"/gm;
 
     export default {
         name: 'App',
@@ -111,9 +111,9 @@
         },
         data() {
             return {
-                template: `<div class="[card]">
-  <h1 class="[card__title]">Please style me!</h1>
-  <div class="[card__content]">And me!</div>
+                template: `<div class="card">
+  <h1 class="card__title">Please style me!</h1>
+  <div class="card__content">And me!</div>
 </div>`,
                 categories,
                 selectedMainCategory: categories[0],
@@ -123,7 +123,7 @@
                 editorOptions: {
                     mode: 'htmlmixed',
                     lineNumbers: true,
-                    theme: 'base16-dark',
+                    theme: 'gruvbox-dark',
                     extraKeys: {
                         Tab(cm) {
                             // Indent, or place 2 spaces
@@ -142,17 +142,39 @@
                         },
                         Enter: 'emmetInsertLineBreak'
                     }
-                },
+                }
             };
         },
         computed: {
             parsedTemplate() {
                 let parsedTemplate = this.template;
+                const regex = classRegEx;
+                const str = this.template;
+                let m;
 
-                for (const placeholder of this.storeState.placeholders) {
-                    const placeholderString = '[' + placeholder.name + ']';
-                    parsedTemplate = parsedTemplate.split(placeholderString).join(placeholder.selected.join(' '));
+                // Extract placeholders from the template
+                while ((m = regex.exec(str)) !== null) {
+                    // This is necessary to avoid infinite loops with zero-width matches
+                    if (m.index === regex.lastIndex) {
+                        regex.lastIndex++;
+                    }
+
+                    const regexResult = m[0];
+                    const mergedClasses = [];
+                    const placeholderClass = m[1].split(' ');
+
+                    // Merge all classes
+                    placeholderClass.forEach((placeholder) => {
+                        const storedPlaceholder = this.storeState.placeholders.find(p => p.name === placeholder);
+
+                        if (storedPlaceholder) {
+                            mergedClasses.push(...storedPlaceholder.selected);
+                        }
+                    });
+
+                    parsedTemplate = parsedTemplate.replace(regexResult, `class="${mergedClasses.join(' ')}"`);
                 }
+
                 return parsedTemplate;
             }
         },
@@ -162,7 +184,7 @@
         },
         methods: {
             sync() {
-                const regex = /class\=\"\[([A-Za-z0-9 _]*)\]\"/gm;
+                const regex = classRegEx;
                 const str = this.template;
                 let m;
                 const newPlaceholders = [];
@@ -174,7 +196,8 @@
                         regex.lastIndex++;
                     }
 
-                    newPlaceholders.push(m[1]);
+                    // If the element has multiple classes we must extract them all as separate classes
+                    m[1].split(' ').forEach(item => newPlaceholders.push(item));
                 }
 
                 // Add placeholders if not already added
@@ -201,9 +224,13 @@
     };
 </script>
 
-<style>
+<style type="text/scss">
 	.CodeMirror {
 		border: 1px solid #eee;
 		height: 160px;
+	}
+
+	.output-editor + .CodeMirror {
+		background: #444;
 	}
 </style>
