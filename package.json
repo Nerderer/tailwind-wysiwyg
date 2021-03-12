@@ -4,20 +4,27 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "parcel watch src/scripts/main.js",
-    "prod": "parcel build src/scripts/main.js"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist",
+    "clean": "gh-pages-clean"
   },
   "devDependencies": {
-    "@vue/component-compiler-utils": "^2.6.0",
-    "eslint": "^5.15.3",
-    "eslint-config-airbnb": "^17.1.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jsx-a11y": "^6.1.1",
-    "eslint-plugin-react": "^7.11.0",
-    "eslint-plugin-vue": "^5.2.2",
-    "parcel-bundler": "^1.12.2",
-    "sass": "^1.17.3",
-    "vue-template-compiler": "^2.6.9"
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/eslint-config-standard": "^5.1.2",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "eslint-plugin-vue": "^6.2.2",
+    "gh-pages": "^3.1.0",
+    "vue-template-compiler": "^2.6.11"
   },
   "dependencies": {
     "codemirror": "^5.45.0",
